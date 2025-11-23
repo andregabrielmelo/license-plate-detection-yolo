@@ -9,22 +9,23 @@ IMG_WIDTH = 32
 IMG_HEIGHT = 20
 RANDOM_SEED = 42
 DATASET_SPLIT = {"train": 0.70, "val": 0.15, "test": 0.15}
-
+DEFAULT_DATASET_PATH = "dataset"
+DEFAULT_YOLO_PATH = "yolo"
 
 def main():
-    # Check command-line arguments
-    if len(sys.argv) < 3:
-        sys.exit("Usage: python main.py data_directory yolo_directory")
+    # Check command-line arguments and use defaults if not provided
+    dataset_path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_DATASET_PATH
+    yolo_path = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_YOLO_PATH
 
     # Prepare data for YOLO format
-    prepare_yolo_dataset(sys.argv[1], sys.argv[2])
+    prepare_yolo_dataset(dataset_path, yolo_path)
 
     # Get a YOLOv11 model
     model = YOLO("yolo11n.pt")
 
     # Fit model on training data
     model.train(
-        data=f"{sys.argv[2]}/data.yaml",
+        data=f"{yolo_path}/data.yaml",
         epochs=EPOCHS,
         imgsz=(IMG_HEIGHT * IMG_WIDTH),
     )
