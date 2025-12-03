@@ -35,8 +35,8 @@ def train_model(
         epochs=epochs,
         imgsz=imgsz,
         batch=16,
-        workers=4,
-        device="mps"
+        patience=5,
+        workers=4
     )
 
     model.val(data=str(data_yaml), imgsz=imgsz)

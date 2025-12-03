@@ -1,6 +1,6 @@
 from pathlib import Path
 
-EPOCHS = 10
+EPOCHS = 30
 IMG_WIDTH = 32
 IMG_HEIGHT = 20
 RANDOM_SEED = 42
