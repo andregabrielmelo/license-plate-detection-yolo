@@ -3,23 +3,7 @@ import random
 import shutil
 from collections import Counter, defaultdict
 
-from config import RANDOM_SEED, DATASET_SPLIT
-
-
-def build_class_to_char_mapping():
-    """
-    0-25 -> A-Z
-    26-35 -> 0-9
-    """
-    mapping = {}
-    # Letras
-    for i in range(26):
-        mapping[i] = chr(ord("A") + i)
-    # Dígitos
-    for i in range(10):
-        mapping[26 + i] = str(i)
-    return mapping
-
+from config import RANDOM_SEED, DATASET_SPLIT, CLASS_TO_CHAR_MAPPING
 
 def decode_plate_from_label(label_path: Path, class_to_char: dict[int, str]) -> str | None:
     """
@@ -71,7 +55,7 @@ def analyze_dataset(input_dir_path: str):
     images = sorted(input_dir.glob("*.png"))
     label_files = sorted(input_dir.glob("*.txt"))
 
-    class_to_char = build_class_to_char_mapping()
+    class_to_char = CLASS_TO_CHAR_MAPPING
 
     total_images = len(images)
     total_labels = len(label_files)
@@ -143,7 +127,7 @@ def analyze_dataset(input_dir_path: str):
         print(f"  {ch}: {char_counter[ch]}")
     print()
 
-    all_chars = set(build_class_to_char_mapping().values())
+    all_chars = set(CLASS_TO_CHAR_MAPPING.values())
     used_chars = set(char_counter.keys())
     unused = sorted(all_chars - used_chars)
 
@@ -181,7 +165,7 @@ def prepare_yolo_dataset(
     repeated_keep_ratio = max(0.0, min(1.0, float(repeated_keep_ratio)))
 
     images = sorted(input_dir.glob("*.png"))
-    class_to_char = build_class_to_char_mapping()
+    class_to_char = CLASS_TO_CHAR_MAPPING
 
     plate_groups: dict[str, list[tuple[Path, Path]]] = defaultdict(list)
 
@@ -264,6 +248,13 @@ def prepare_yolo_dataset(
                 total_copied += 1
 
     yaml_path = output_dir / "data.yaml"
+    # Gera o bloco 'names' do yaml dinamicamente com base no mapeamento atual
+    class_map = CLASS_TO_CHAR_MAPPING
+    names_lines = []
+    for k in sorted(class_map.keys()):
+        names_lines.append(f"    {k}: {class_map[k]}")
+    names_block = "\n".join(names_lines)
+
     with yaml_path.open("w", encoding="utf-8") as f:
         f.write(
             f"""path: {output_dir.resolve()}
@@ -272,42 +263,7 @@ val: val/images
 test: test/images
 
 names:
-    0: A
-    1: B
-    2: C
-    3: D
-    4: E
-    5: F
-    6: G
-    7: H
-    8: I
-    9: J
-    10: K
-    11: L
-    12: M
-    13: N
-    14: O
-    15: P
-    16: Q
-    17: R
-    18: S
-    19: T
-    20: U
-    21: V
-    22: W
-    23: X
-    24: Y
-    25: Z
-    26: 0
-    27: 1
-    28: 2
-    29: 3
-    30: 4
-    31: 5
-    32: 6
-    33: 7
-    34: 8
-    35: 9
+{names_block}
 """
         )
 
