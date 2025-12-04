@@ -11,3 +11,5 @@ wheels/
 
 runs/
 .DS_Store
+yolo
+yolo/data.yaml
